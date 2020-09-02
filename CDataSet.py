@@ -12,10 +12,10 @@ def SkinColorLower (Hue,mult1,mult2):
     lower = np.array(lower)
     return lower
 
-direc = ('Fotos/Prueba15.jpg')
+direc = ('Fotos/Prueba19.jpg')
 img = cv2.imread(direc,1)
-cv2.imshow("Imagen",img)
-cv2.waitKey(0)
+# cv2.imshow("Imagen",img)
+# cv2.waitKey(0)
 heigth, width = img.shape[:2]
 #print (img.shape)
 
@@ -38,8 +38,8 @@ edges= cv2.morphologyEx(edges, cv2.MORPH_OPEN, kernel)
 contours, hierarchy = cv2.findContours(edges.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 draw = cv2.drawContours(img,contours,-1,(255,0,0),3)
 
-# cv2.imshow("mask",draw)
-# cv2.waitKey(0)
+cv2.imshow("mask",draw)
+cv2.waitKey(0)
 
 
 
