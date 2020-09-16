@@ -77,7 +77,6 @@ for j in range(1,3):
         # cv2.waitKey(0)
         
         contours_2,hierarchy_2 = cv2.findContours(edges_res.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-        #draw = cv2.drawContours(edges_res,contours,-1,(255,0,0),3)
         
         # cv2.imshow("img_resize",edges_res)
         # cv2.waitKey(0)
@@ -86,27 +85,30 @@ for j in range(1,3):
             currentContour =  component_2[0]
             x,y,w,h = cv2.boundingRect(currentContour)
             M = cv2.moments(currentContour)
-            #print(M)
             cx = M['m10']/M['m00']
             cy = M['m01']/M['m00']
             A = cv2.contourArea(currentContour)
             p = cv2.arcLength(currentContour,True)
             aP=A/float(p*p)
-            # print(M['m10'],M['m01'],M['m00'],cx,cy,A,p,aP)
-            print(A)
             Hu = cv2.HuMoments(M)
-            # print(Hu)
-            VectorCarac = np.array([cx,cy,A,p,aP,Hu[0],Hu[1],Hu[2],Hu[3],Hu[4],Hu[5],Hu[6],M['m00'],M['m01'],M['m10'],M['m11']])
+            aT=np.count_nonzero(edges_res)
+            Comp = aT/float(p*p)
+            hull = cv2.convexHull(currentContour)
+            
+            VectorCarac = np.array([cx,cy,A,p,aP,Hu[0],Hu[1],Hu[2],Hu[3],Hu[4],Hu[5],Hu[6],M['m00'],M['m01'],M['m10'],M['m11'],aT,Comp])
             for carac in (VectorCarac):
                     worksheet.write(row,col,str(j))
                     worksheet.write(row,i, carac)
                     i=i+1
             i=1
             row+=1
+            
+            print(Hu[4])
             xlabel.append(j)
-            ylabel.append(A)
-        cv2.imshow("Imagen",img)
-        cv2.waitKey(0)
+            ylabel.append(Hu[4])
+            
+        # cv2.imshow("Imagen",img)
+        # cv2.waitKey(0)
             
 plt.plot(xlabel,ylabel,"bo")
 plt.show()
