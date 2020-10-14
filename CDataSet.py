@@ -16,6 +16,13 @@ ylabel = []
 #Nuevo libro excel
 databook = xlsxwriter.Workbook('DatosTrain.xlsx')
 worksheet = databook.add_worksheet('Train')#nueva hoja
+Carac = ["Hu0","Hu1","Hu2","Hu3","Hu4","Hu5","Hu6","M00","M01","M10","M11","aT","Comp"]
+for c in Carac:
+    worksheet.write(row,col,"Number")
+    worksheet.write(row,i, c)
+    i=i+1
+i=1
+row+=1
 
 def SkinColorUpper (Hue,mult1,mult2):
     upper = [Hue,mult1*255,mult2*255]

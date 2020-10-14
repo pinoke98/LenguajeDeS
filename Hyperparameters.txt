@@ -1,0 +1,2 @@
+{'activation': 'tanh', 'alpha': 1e-06, 'hidden_layer_sizes': 169, 'learning_rate': 'adaptive'}
+{'activation': 'tanh', 'alpha': 1e-06, 'hidden_layer_sizes': 169, 'learning_rate': 'adaptive'}
