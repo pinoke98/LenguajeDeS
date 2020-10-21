@@ -4,7 +4,6 @@ Created on Wed Oct  7 12:02:28 2020
 
 @author: jorge
 """
-import numpy as np
 from time import time
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -26,7 +25,6 @@ validation_ratio = 0.2
 test_ratio = 0.2
 
 data = pd.read_excel("DatosTrain.xlsx")
-df = pd.DataFrame(data)
 df = df[df['Number'].isin(['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21',
                             '22','23','24','25','26'])]
 
@@ -50,27 +48,27 @@ val_x = val.drop(['Number'], axis = 1)
 train_x = train.drop(['Number'], axis = 1)
 test_x = test.drop(['Number'], axis = 1)
 
-# train_class_proportions = get_class_proportion(train)
-# test_class_proportions = get_class_proportion(test)
-# val_class_proportions = get_class_proportion(val)
+train_class_proportions = get_class_proportion(train)
+test_class_proportions = get_class_proportion(test)
+val_class_proportions = get_class_proportion(val)
 
-# train_class_counts = get_class_counts(train)
-# test_class_counts = get_class_counts(test)
-# val_class_counts = get_class_counts(val)
+train_class_counts = get_class_counts(train)
+test_class_counts = get_class_counts(test)
+val_class_counts = get_class_counts(val)
 
-# print("Train class counts", train_class_counts)
-# print("")
-# print("Test class counts", test_class_counts)
-# print("")
-# print("Val class counts", val_class_counts)
-# print("")
+print("Train class counts", train_class_counts)
+print("")
+print("Test class counts", test_class_counts)
+print("") 
+print("Val class counts", val_class_counts)
+print("")
 
-# print("Train data class proportions", train_class_proportions)
-# print("")
-# print("Test data class proportions", test_class_proportions)
-# print("")
-# print("Val data class proportions", val_class_proportions)
-# print("")
+print("Train data class proportions", train_class_proportions)
+print("")
+print("Test data class proportions", test_class_proportions)
+print("")
+print("Val data class proportions", val_class_proportions)
+print("")
 
 
 def Parameters():
@@ -85,8 +83,6 @@ def Parameters():
     scores = ['precision', 'recall']
     
     best_params = []
-    
-    print(type(train_x))
     
     mlp = MLPClassifier()
     
@@ -121,21 +117,10 @@ def Parameters():
         print()
     return best_params
 
-# def load_xlsx(d):
-#     #print(d)
-#     d=np.array(d).astype(np.float64)
-#     d=d.transpose()
-#     y=d[0]
-#     x=d[1:13].transpose()
-#     print(x)
-#     return x,y
-
 if __name__ == '__main__':
     t0 = time()
     parameters = Parameters()
     print(parameters)
-    accuracy = 0
-    i = 0
     mlp = MLPClassifier(activation = "tanh",alpha = 0.001,hidden_layer_sizes = (31),learning_rate="invscaling",max_iter=10000,tol = 0.00001)
     mlp.fit(train_x,train_y)
     Test_pred = mlp.predict(test_x)
@@ -147,6 +132,5 @@ if __name__ == '__main__':
     print("Train error: ", Train_error)
     print("Test error: ", Test_error)
     print("Validation error: ", Val_error)
-    i+=1
     print ("\n")
     print("done in %0.16fs" % (time() - t0))

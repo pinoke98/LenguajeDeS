@@ -124,6 +124,14 @@ test_class_proportions = get_class_proportion(test)
 print("Train data class proportions", train_class_proportions)
 print("Test data class proportions", test_class_proportions)
 
+parameters={
+    'learning_rate': ["constant", "invscaling", "adaptive"],
+    'hidden_layer_sizes': [(13),(10),(31),(100),(169),(31,10)],
+    'alpha': [0.001,0.0001],
+    'activation': ["logistic", "relu", "tanh"],
+    'max_iter' : [5000]
+    }
+
 
 
 
