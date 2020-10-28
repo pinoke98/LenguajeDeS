@@ -90,7 +90,7 @@ def Parameters():
         print("# Tuning hyper-parameters for %s" % score)
         print()
     
-        clf = GridSearchCV(mlp,parameters,n_jobs=-1,cv=2,scoring='%s_macro'%score)
+        clf = GridSearchCV(mlp,parameters,n_jobs=-1,cv=7,scoring='%s_macro'%score)
         clf.fit(train_x, train_y)
     
         print("Best parameters set found on development set:")
@@ -119,8 +119,8 @@ def Parameters():
 
 if __name__ == '__main__':
     t0 = time()
-    parameters = Parameters()
-    print(parameters)
+    #parameters = Parameters()
+    #print(parameters)
     mlp = MLPClassifier(activation = "tanh",alpha = 0.001,hidden_layer_sizes = (31),learning_rate="invscaling",max_iter=10000,tol = 0.00001)
     mlp.fit(train_x,train_y)
     Test_pred = mlp.predict(test_x)

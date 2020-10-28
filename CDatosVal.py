@@ -3,7 +3,6 @@ import numpy as np
 import xlsxwriter
 from glob import glob
 import matplotlib.pyplot as plt
-#from sklearn.preprocessing import StandardScaler
 
 i=1
 
@@ -14,12 +13,12 @@ xlabel = []
 ylabel = []
 
 #Nuevo libro excel
-databook = xlsxwriter.Workbook('DatosTrain.xlsx')
+databook = xlsxwriter.Workbook('DatosVal.xlsx')
 worksheet = databook.add_worksheet('Train')#nueva hoja
 Carac = ["Hu0","Hu1","Hu2","Hu3","Hu4","Hu5","Hu6","M00","M01","M10","M11","aT","Comp"]
-#Carac = ["cx","cy"]
+#Carac = ["Hu0","Hu1","aT","Comp","M00"]
+worksheet.write(row,col,"Number")
 for c in Carac:
-    worksheet.write(row,col,"Number")
     worksheet.write(row,i, c)
     i=i+1
 i=1
@@ -35,8 +34,8 @@ def SkinColorLower (Hue,mult1,mult2):
     lower = np.array(lower)
     return lower
 
-for j in range(1,27):
-    img_Carpeta = ('Fotos/'+str(j)+'/'+str(j)+' (*.jpg')
+for j in range(1,26):
+    img_Carpeta = ('Validacion/'+str(j)+'/'+str(j)+' (*.jpg')
     img_names = glob(img_Carpeta)
     for fn in img_names:
         print(fn)
@@ -107,7 +106,8 @@ for j in range(1,27):
         hull = cv2.convexHull(currentContour)
         
         VectorCarac = np.array([Hu[0],Hu[1],Hu[2],Hu[3],Hu[4],Hu[5],Hu[6],M['m00'],M['m01'],M['m10'],M['m11'],aT,Comp])
-        #VectorCarac = np.array([cx,cy])
+        #print(VectorCarac)
+        #VectorCarac = np.array([Hu[0],Hu[1],aT,Comp,M['m00']])
         for carac in (VectorCarac):
                 worksheet.write(row,col,str(j))
                 worksheet.write(row,i, carac)
@@ -115,9 +115,9 @@ for j in range(1,27):
         i=1
         row+=1
             
-        print(cx)
+        #print(Comp)
         xlabel.append(j)
-        ylabel.append(cx)
+        ylabel.append(Comp)
 
             
 plt.plot(xlabel,ylabel,"bo")
