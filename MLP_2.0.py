@@ -29,7 +29,7 @@ def get_class_proportion(df):
 while(True):
     t0 = time()
     df = pd.read_excel("DatosTrain.xlsx")
-    print(df)
+    #print(df)
     df_y = df['Number']
     df_x = df.drop(['Number'], axis = 1)
     StandScaler = StandardScaler()
@@ -39,7 +39,7 @@ while(True):
     df = pd.DataFrame(df_x_scaled, columns = df_x.columns)
     df.insert(0,"Number",df_y,True)
     #print(df)
-    train,test = train_test_split(df,test_size=0.3,stratify=df['Number'])
+    train,test = train_test_split(df,test_size=0.25,stratify=df['Number'])
     
     # train_class_proportions = get_class_proportion(train)
     # test_class_proportions = get_class_proportion(test)
@@ -63,20 +63,16 @@ while(True):
     test_x = test.drop(['Number'], axis = 1)
     
     parameters={
-        'learning_rate': ["constant", "invscaling", "adaptive"],
-        'hidden_layer_sizes': [(31),(100,100),(10),(20)],
-        'alpha': [0.001,0.0001],
-        'activation': ["logistic", "relu", "tanh"],
-        'max_iter' : [10000]
+        'hidden_layer_sizes': [(31),(10),(20),(64),(32),(64,32)],
         }
     
-    score = 'precision'
+    score = 'recall'
     
-    mlp = MLPClassifier()
+    mlp = MLPClassifier(learning_rate="invscaling", alpha=0.0001,max_iter=10000,activation="relu")
     print("# Tuning hyper-parameters for %s" % score)
     print()
     
-    clf = GridSearchCV(mlp,parameters,n_jobs=-1,cv=4,scoring='%s_macro'%score)
+    clf = GridSearchCV(mlp,parameters,n_jobs=-1,cv=10,scoring='%s_macro'%score)
     clf.fit(train_x, train_y)
     
     print("Best parameters set found on development set:")
@@ -113,7 +109,7 @@ while(True):
     print ("")
     print("done in %0.16fm" % ((time() - t0)/60))
     print("")
-    if ( Train_error>=0 and Test_error<10):
+    if ( Train_error>=0 and Test_error<9):
         break
 dump(StandScaler,'sca_params.pkl')
 dump(clf,'model_clf2.0.pkl')

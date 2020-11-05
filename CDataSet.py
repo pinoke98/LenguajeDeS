@@ -16,8 +16,9 @@ ylabel = []
 #Nuevo libro excel
 databook = xlsxwriter.Workbook('DatosTrain.xlsx')
 worksheet = databook.add_worksheet('Train')#nueva hoja
-Carac = ["Hu0","Hu1","Hu2","Hu3","Hu4","Hu5","Hu6","M00","M01","M10","M11","aT","Comp"]
-#Carac = ["cx","cy"]
+Carac = ["Compacidad","Hu0","Hu1","Hu2","Hu3","Aspect_Ratio","Rect_area",
+         "Extent","Hull_Area","Solidity","Equi_Diameter"]
+
 for c in Carac:
     worksheet.write(row,col,"Number")
     worksheet.write(row,i, c)
@@ -100,13 +101,20 @@ for j in range(1,27):
         cy = M['m01']/M['m00']
         A = cv2.contourArea(currentContour)
         p = cv2.arcLength(currentContour,True)
-        aP=A/float(p*p)
+        Compacidad=A/float(p*p)
         Hu = cv2.HuMoments(M)
-        aT=np.count_nonzero(edges_res)
-        Comp = aT/float(p*p)
+        Non_zeros=np.count_nonzero(edges_res)
+        Compacidad_Non_zeros = Non_zeros/float(p*p)
         hull = cv2.convexHull(currentContour)
+        aspect_ratio = float(w)/h
+        rect_area = w*h
+        extent = float(A)/rect_area
+        hull_area = cv2.contourArea(hull)
+        solidity = float(A)/hull_area
+        equi_diameter = np.sqrt(4*A/np.pi)
+                
         
-        VectorCarac = np.array([Hu[0],Hu[1],Hu[2],Hu[3],Hu[4],Hu[5],Hu[6],M['m00'],M['m01'],M['m10'],M['m11'],aT,Comp])
+        VectorCarac = np.array([Compacidad,Hu[0],Hu[1],Hu[2],aspect_ratio,rect_area,extent,hull_area,solidity,equi_diameter])
         #VectorCarac = np.array([cx,cy])
         for carac in (VectorCarac):
                 worksheet.write(row,col,str(j))
@@ -114,13 +122,6 @@ for j in range(1,27):
                 i=i+1
         i=1
         row+=1
-            
-        print(cx)
-        xlabel.append(j)
-        ylabel.append(cx)
 
-            
-plt.plot(xlabel,ylabel,"bo")
-plt.show()
 cv2.destroyAllWindows()
 databook.close()
