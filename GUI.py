@@ -1,6 +1,19 @@
 import PySimpleGUI as sg
 import cv2
 import numpy as np
+from joblib import load
+
+letras = {1:"A",2:"B",3:"C",4:"D",5:"E",6:"F",7:"G",8:"H",9:"I",10:"J",11:"K",12:"L",13:"M",14:"N",15:"O",16:"P",17:"Q",18:"R",19:"S",20:"T",21:"U",22:"V",23:"W",24:"X",25:"Y",26:"Z"}
+
+def SkinColorUpper (Hue,mult1,mult2):
+    upper = [Hue,mult1*255,mult2*255]
+    upper = np.array(upper)
+    return upper
+
+def SkinColorLower (Hue,mult1,mult2):
+    lower = [Hue,mult1*255,mult2*255]
+    lower = np.array(lower)
+    return lower
 
 def main():
     sg.theme("DefaultNoMoreNagging")
@@ -9,7 +22,7 @@ def main():
     layout = [
         [sg.Text("Traductor",font='Helvetica 20 bold italic', justification="center")],
         [sg.Image(filename="", key="-IMAGE-"),  
-         sg.Multiline('Traducción letra a letra:\n', size=(40,10),font='Helvetica 15  bold italic')],
+         sg.Multiline('Traducción letra a letra:\n', size=(40,10),font='Helvetica 15  bold italic',key='Multiline')],
         [sg.Text("\t \t\t  ",font='Helvetica 20 bold italic', justification="center"),sg.Button( 'Traducir ⮂',image_data=image_grey1,font='Helvetica 10 bold italic', button_color=('black', sg.theme_background_color()), border_width=0,),sg.Button( 'Borrar',image_data=image_grey1,font='Helvetica 10 bold italic', button_color=('black', sg.theme_background_color()), border_width=0,),sg.Button( 'Salir',image_data=image_grey1,font='Helvetica 10 bold italic', button_color=('black', sg.theme_background_color()), border_width=0,)]
     ]
 
@@ -29,9 +42,86 @@ def main():
         imgbytes = cv2.imencode(".png", frame)[1].tobytes()
         window["-IMAGE-"].update(data=imgbytes)
         if 'Traducir ⮂':
-            ret, frame = cap.read()
-            imgbytes = cv2.imencode(".png", frame)[1].tobytes()
-            window["-IMAGE-"]
+            ret, img = cap.read()
+            heigth, width = img.shape[:2]
+        
+            start_row,start_col = int(0),int(0)
+            end_row, end_col = int(heigth), int(width*.3)
+            img = img[start_row:end_row,start_col:end_col]
+            
+            hls = cv2.cvtColor(img,cv2.COLOR_BGR2HLS)        
+            mask = cv2.inRange(hls,SkinColorLower(0,0.2,0),SkinColorUpper(27,0.72,0.75))
+            blur = cv2.medianBlur(mask,5)
+            
+            # cv2.imshow("blur",blur)
+            # cv2.waitKey(0)
+            
+            ret,edges = cv2.threshold(blur,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
+            edges= cv2.morphologyEx(edges, cv2.MORPH_OPEN, kernel)
+            
+            # cv2.imshow("ThreshHold", edges)
+            # cv2.waitKey(0)
+            
+            contours, hierarchy = cv2.findContours(edges.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+            draw = cv2.drawContours(img,contours,-1,(255,0,0),3)
+            
+            # cv2.imshow("Imagen",img)
+            # cv2.waitKey(0)
+            
+            c = max(contours, key = cv2.contourArea)
+            x,y,w,h = cv2.boundingRect(c)
+            empty = np.zeros((h,w),np.uint8)
+            cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),1)
+            roi = edges[y:y+h,x:x+w]
+            empty[0:h,0:w]=roi
+            edges=empty
+            
+            # cv2.imshow("Edges",edges)
+            # cv2.waitKey(0)
+            
+            img_resize = cv2.resize(edges,(100,100),interpolation=cv2.INTER_AREA)
+            ret, edges_res = cv2.threshold(img_resize,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            
+            # cv2.imshow("img_resize",edges_res)
+            # cv2.waitKey(0)
+            
+            contours_2,hierarchy_2 = cv2.findContours(edges_res.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+            
+            #cv2.imshow("img_resize",edges_res)
+            #cv2.waitKey(0)
+            
+            currentContour = max(contours_2, key = cv2.contourArea)
+            x,y,w,h = cv2.boundingRect(c)
+            M = cv2.moments(currentContour)
+            cx = M['m10']/M['m00']
+            cy = M['m01']/M['m00']
+            A = cv2.contourArea(currentContour)
+            p = cv2.arcLength(currentContour,True)
+            Compacidad=A/float(p*p)
+            Hu = cv2.HuMoments(M)
+            Non_zeros=np.count_nonzero(edges_res)
+            Compacidad_Non_zeros = Non_zeros/float(p*p)
+            hull = cv2.convexHull(currentContour)
+            aspect_ratio = float(w)/h
+            rect_area = w*h
+            extent = float(A)/rect_area
+            hull_area = cv2.contourArea(hull)
+            solidity = float(A)/hull_area
+            equi_diameter = np.sqrt(4*A/np.pi)
+                    
+            
+            VectorCarac = np.array([Compacidad,Hu[0],Hu[1],Hu[2],aspect_ratio,rect_area,extent,hull_area,solidity,equi_diameter])
+            print(VectorCarac)
+            clf = load("model_clf2.0.pkl")
+
+            StandScaler = load("sca_params.pkl")
+            vectorCaracScaler= StandScaler.transform(VectorCarac)
+            prediccion = clf.predict(vectorCaracScaler)
+            window[Multiline].update('Prediccion',font='Helvetica 20 bold italic', justification="center",append=True)
+                 
+
+
         elif expression:
             pass
 
