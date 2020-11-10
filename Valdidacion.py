@@ -4,6 +4,7 @@ Created on Tue Oct 27 17:09:02 2020
 
 @author: jorge
 """
+letras = {1:'A',2:'B'}
 import pandas as pd
 from joblib import load
 import numpy as np

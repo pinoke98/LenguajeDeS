@@ -41,7 +41,7 @@ def main():
 
         imgbytes = cv2.imencode(".png", frame)[1].tobytes()
         window["-IMAGE-"].update(data=imgbytes)
-        if 'Traducir ⮂':
+        if event == 'Traducir ⮂':
             ret, img = cap.read()
             heigth, width = img.shape[:2]
         
@@ -66,8 +66,8 @@ def main():
             contours, hierarchy = cv2.findContours(edges.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
             draw = cv2.drawContours(img,contours,-1,(255,0,0),3)
             
-            # cv2.imshow("Imagen",img)
-            # cv2.waitKey(0)
+            cv2.imshow("Imagen",img)
+            cv2.waitKey(0)
             
             c = max(contours, key = cv2.contourArea)
             x,y,w,h = cv2.boundingRect(c)
@@ -111,19 +111,19 @@ def main():
             equi_diameter = np.sqrt(4*A/np.pi)
                     
             
-            VectorCarac = np.array([Compacidad,Hu[0],Hu[1],Hu[2],aspect_ratio,rect_area,extent,hull_area,solidity,equi_diameter])
-            print(VectorCarac)
-            clf = load("model_clf2.0.pkl")
+            VectorCarac = np.array([Compacidad,Hu[0],Hu[1],Hu[2],aspect_ratio,rect_area,extent,hull_area,solidity,equi_diameter,0,0,0])
+            VectorCarac = VectorCarac.reshape(1,-1)
+            #print(VectorCarac)
+            clf = load("model_clf.pkl")
 
             StandScaler = load("sca_params.pkl")
             vectorCaracScaler= StandScaler.transform(VectorCarac)
             prediccion = clf.predict(vectorCaracScaler)
-            window[Multiline].update('Prediccion',font='Helvetica 20 bold italic', justification="center",append=True)
-                 
+            #print("prediccion",prediccion)
+            letra = letras[prediccion[0]]
+            #print("letra",letra)
+            window['Multiline'].update(letra,font='Helvetica 20 bold italic',append=True)
 
-
-        elif expression:
-            pass
 
 
     window.close()
