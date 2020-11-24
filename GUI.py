@@ -22,7 +22,8 @@ def main():
     layout = [
         [sg.Text("Traductor",font='Helvetica 20 bold italic', justification="center")],
         [sg.Image(filename="", key="-IMAGE-"),  
-         sg.Multiline('Traducción letra a letra:\n', size=(40,10),font='Helvetica 15  bold italic',key='Multiline')],
+         sg.Multiline('Traducción letra a letra:\n', size=(40,10),disabled=True,font='Helvetica 15  bold italic',key='Multiline')],
+         [sg.Text("\t\t              ",font='Helvetica 20 bold italic', justification="center"),sg.Radio("Modelo 1", "Radio", size=(10, 1),key="Modelo1"),sg.Radio("Modelo 2", "Radio", size=(10, 1),key="Modelo2"),sg.Radio("Modelo 3", "Radio",True, size=(10, 1),key="Modelo3")],
         [sg.Text("\t \t\t  ",font='Helvetica 20 bold italic', justification="center"),sg.Button( 'Traducir ⮂',image_data=image_grey1,font='Helvetica 10 bold italic', button_color=('black', sg.theme_background_color()), border_width=0,),sg.Button( 'Borrar',image_data=image_grey1,font='Helvetica 10 bold italic', button_color=('black', sg.theme_background_color()), border_width=0,),sg.Button( 'Salir',image_data=image_grey1,font='Helvetica 10 bold italic', button_color=('black', sg.theme_background_color()), border_width=0,)]
     ]
 
@@ -30,6 +31,8 @@ def main():
     window = sg.Window("TLS", layout, location=(100, 50))
 
     cap = cv2.VideoCapture(0)
+
+
     
     while True:
         event, values = window.read(timeout=20)
@@ -37,11 +40,24 @@ def main():
             break
 
         ret, frame = cap.read()
+        frame=cv2.line(frame,(200,0),(200,720),(0,0,250),2)
 
 
         imgbytes = cv2.imencode(".png", frame)[1].tobytes()
         window["-IMAGE-"].update(data=imgbytes)
-        if event == 'Traducir ⮂':
+        if values["Modelo1"]:
+            modelClf ="model_clf.pkl"
+            modelScaler="sca_params.pkl"
+            
+        elif values["Modelo2"]:
+            modelClf ="model_clf.pkl"
+            modelScaler="sca_params.pkl"
+
+        elif values["Modelo3"]:
+            modelClf ="model_clf.pkl"
+            modelScaler="sca_params.pkl"
+        
+        if event == ('Traducir ⮂'):
             ret, img = cap.read()
             heigth, width = img.shape[:2]
         
@@ -114,9 +130,9 @@ def main():
             VectorCarac = np.array([Compacidad,Hu[0],Hu[1],Hu[2],aspect_ratio,rect_area,extent,hull_area,solidity,equi_diameter,0,0,0])
             VectorCarac = VectorCarac.reshape(1,-1)
             #print(VectorCarac)
-            clf = load("model_clf.pkl")
+            clf = load(modelClf)
 
-            StandScaler = load("sca_params.pkl")
+            StandScaler = load(modelScaler)
             vectorCaracScaler= StandScaler.transform(VectorCarac)
             prediccion = clf.predict(vectorCaracScaler)
             #print("prediccion",prediccion)
