@@ -17,7 +17,7 @@ ylabel = []
 databook = xlsxwriter.Workbook('DatosTrain.xlsx')
 worksheet = databook.add_worksheet('Train')#nueva hoja
 Carac = ["Compacidad","Hu0","Hu1","Hu2","Hu3","Aspect_Ratio","Rect_area",
-         "Extent","Hull_Area","Solidity","Equi_Diameter"]
+         "Extent","Hull_Area","Solidity"]
 
 for c in Carac:
     worksheet.write(row,col,"Number")
@@ -36,7 +36,7 @@ def SkinColorLower (Hue,mult1,mult2):
     lower = np.array(lower)
     return lower
 
-for j in range(1,27):
+for j in range(1,28):
     img_Carpeta = ('Fotos/'+str(j)+'/'+str(j)+' (*.jpg')
     img_names = glob(img_Carpeta)
     for fn in img_names:

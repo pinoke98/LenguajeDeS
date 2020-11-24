@@ -29,6 +29,7 @@ def get_class_proportion(df):
 while(True):
     t0 = time()
     df = pd.read_excel("DatosTrain.xlsx")
+    df.info()
     #print(df)
     df_y = df['Number']
     df_x = df.drop(['Number'], axis = 1)
@@ -63,12 +64,12 @@ while(True):
     test_x = test.drop(['Number'], axis = 1)
     
     parameters={
-        'hidden_layer_sizes': [(31),(10),(20),(64),(32),(64,32)],
+        'hidden_layer_sizes': [(64),(32),(64,32)],
         }
     
     score = 'recall'
     
-    mlp = MLPClassifier(learning_rate="invscaling", alpha=0.0001,max_iter=10000,activation="relu")
+    mlp = MLPClassifier(learning_rate="invscaling", alpha=0.0001,max_iter=10000,activation="logistic")
     print("# Tuning hyper-parameters for %s" % score)
     print()
     
@@ -101,7 +102,7 @@ while(True):
     print(classification_report(y_true, y_pred))
     print()
     Test_pred = clf.predict(test_x)
-    print("Ygorro:",Test_pred)
+    # print("Ygorro:",Test_pred)
     Test_error = 100 - clf.score(test_x,test_y)*100
     Train_error = 100 - clf.score(train_x,train_y)*100
     print("Train error: ", Train_error)
@@ -109,7 +110,7 @@ while(True):
     print ("")
     print("done in %0.16fm" % ((time() - t0)/60))
     print("")
-    if ( Train_error>=0 and Test_error<9):
+    if ( Train_error>=0 and Test_error<15):
         break
-dump(StandScaler,'sca_params.pkl')
-dump(clf,'model_clf2.0.pkl')
+dump(StandScaler,'sca_params25.pkl')
+dump(clf,'model_clf25.pkl')
